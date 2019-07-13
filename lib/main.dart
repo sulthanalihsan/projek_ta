@@ -5,21 +5,19 @@ import 'package:http/http.dart' as http;
 import 'package:projek_ta/IndexPage.dart';
 import 'package:projek_ta/model/api.dart';
 import 'package:projek_ta/views/deposit/deposit_view.dart';
-import 'package:projek_ta/views/deposit/detailTagihan.dart';
-import 'package:projek_ta/views/deposit/konfirmasiDeposit.dart';
+import 'package:projek_ta/views/registrasi/registrasi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 void main() {
-  _MyAppState _myAppState = _MyAppState();
+  _MyAppState _myAppState = new _MyAppState();
 
   runApp(MaterialApp(
       home: MyApp(),
       routes: {
         "/home": (context) => MyApp(),
         "/home/deposit_view": (context) => DepositView(),
-        "/home/deposit_view/konfirmasiDeposit": (context) =>
-            KonfirmasiDeposit(),
-        "/home/detailTagihan": (context) => DetailTagihan(),
+        "/tab2": (context) => IndexPage(_myAppState.signOut, 1),
       },
       // initialRoute: MyApp.routeName,
       debugShowCheckedModeBanner: false,
@@ -52,8 +50,8 @@ class _MyAppState extends State<MyApp> {
   check() {
     final form = _key.currentState;
     if (form.validate()) {
+      _onLoading();
       form.save();
-      login();
     } else {
       setState(() {
         _autovalidate = true;
@@ -71,14 +69,29 @@ class _MyAppState extends State<MyApp> {
     final data = dataBody['data_akun'];
 
     if (status == 1) {
+      showSimpleNotification(context, Text("Login Berhasil"),
+          background: Colors.green);
       setState(() {
         _loginStatus = LoginStatus.signIn;
-        savePref(status, data['id_plg'], data['email_plg'], data['nama_plg'],
-            data['saldo_plg']);
+        savePref(
+            status,
+            data['id_plg'],
+            data['email_plg'],
+            data['nama_plg'],
+            data['nama_pgl_plg'],
+            data['saldo_plg'],
+            data['jk_plg'],
+            data['nohp_plg'],
+            data['alamat_plg'],
+            data['transaksi']);
       });
-      print(pesan);
-      print(data);
+      // print("JUMLAH TRANSAKSI");
+      // print(data['transaksi']);
+      // print(data);
     } else {
+      showSimpleNotification(
+          context, Text("Login Gagal, Email atau password salah"),
+          background: Colors.red);
       setState(() {
         _loginStatus = LoginStatus.notSignIn;
       });
@@ -86,15 +99,29 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  savePref(int status, String idPlg, String emailPlg, String namaPlg,
-      String saldoPlg) async {
+  savePref(
+      int status,
+      String idPlg,
+      String emailPlg,
+      String namaPlg,
+      String namaPglPlg,
+      String saldoPlg,
+      String jkPlg,
+      String noHpPlg,
+      String alamatPlg,
+      int jmlRwtPesanan) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       preferences.setInt("status", status);
       preferences.setString("idPlg", idPlg);
       preferences.setString("emailPlg", emailPlg);
       preferences.setString("namaPlg", namaPlg);
+      preferences.setString("namaPglPlg", namaPglPlg);
       preferences.setString("saldoPlg", saldoPlg);
+      preferences.setString("jkPlg", jkPlg);
+      preferences.setString("noHpPlg", noHpPlg);
+      preferences.setString("alamatPlg", alamatPlg);
+      preferences.setInt("jmlRwtPesanan", jmlRwtPesanan);
       preferences.commit();
     });
   }
@@ -119,9 +146,37 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _onLoading() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Container(
+              height: MediaQuery.of(context).size.height / 4,
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Text("Loading...")
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pop(context);
+      login();
+    });
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getPref();
   }
@@ -232,7 +287,10 @@ class _MyAppState extends State<MyApp> {
                           height: 10.0,
                         ),
                         InkWell(
-                            onTap: () {},
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Registrasi())),
                             child: Text(
                               'Belum punya akun? Klik Disini',
                               style: TextStyle(
@@ -251,7 +309,7 @@ class _MyAppState extends State<MyApp> {
         break;
 
       case LoginStatus.signIn:
-        return IndexPage(signOut);
+        return IndexPage(signOut, 0);
     }
   }
 }

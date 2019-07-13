@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:projek_ta/model/detailJasaModel.dart';
+import 'package:projek_ta/model/ongkirModel.dart';
 import 'package:projek_ta/views/pesan/checkout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class inputKetPesan extends StatefulWidget {
+  final Map dataPilihanJasa; // ini berupa id aja contoh {1:0,2:0,3:0, dst}
+  final List<OngkirModel> dataOngkir;
+  final List<DetailJasaModel> dtDetailJasa;
+
+  inputKetPesan(this.dataPilihanJasa, this.dataOngkir, this.dtDetailJasa);
+
   @override
   _inputKetPesanState createState() => _inputKetPesanState();
 }
 
 class _inputKetPesanState extends State<inputKetPesan> {
-  String alamat, noHpPemesan, tglWaktuInput; //data siap masuk ke api
+  String alamat, noHpPemesan, tglWaktuInput, cttnPesanan, idPlg;
+  int _valuePilihKec;
+  //data siap masuk ke api
+
   String tglJemputTampil = "Atur tanggal", wktJemputTampil = "Atur waktu";
   String tglJemputKonvert, wktJemputKonvert;
 
@@ -54,11 +66,18 @@ class _inputKetPesanState extends State<inputKetPesan> {
       form.save();
       if (tglJemputTampil != "Atur tanggal" &&
           wktJemputTampil != "Atur waktu" &&
-          _pilihKec != "Pilih kecamatan anda") {
+          _valuePilihKec != null) {
         tglWaktuInput = "$tglJemputKonvert $wktJemputKonvert";
-        print("$alamat $noHpPemesan $tglWaktuInput $_pilihKec");
+        gabungData();
+        print(
+            "$alamat $_valuePilihKec $tglWaktuInput $noHpPemesan $cttnPesanan");
+        print(widget.dataPilihanJasa);
+        print(dataSiapKirim);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Checkout()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => Checkout(
+                    dataSiapKirim, widget.dataOngkir, widget.dtDetailJasa)));
       } else {
         _snackBarShow("Input data jangan ada yang kosong");
       }
@@ -68,6 +87,20 @@ class _inputKetPesanState extends State<inputKetPesan> {
         _autovalidate = true;
       });
     }
+  }
+
+  Map dataSiapKirim; //model yang ini nah // {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 1, waktu_jemput: 2019-06-27 17:00:00, alamat_pesanan: asd, id_ongkir: 1, nohp_pemesan: 123, catatan_pesanan: asd, id_metode_bayar: null, id_plg: 29}
+  gabungData() {
+    setState(() {
+      dataSiapKirim = widget.dataPilihanJasa;
+      dataSiapKirim["waktu_jemput"] = tglWaktuInput;
+      dataSiapKirim["alamat_pesanan"] = alamat;
+      dataSiapKirim["id_ongkir"] = _valuePilihKec;
+      dataSiapKirim["nohp_pemesan"] = noHpPemesan;
+      dataSiapKirim["catatan_pesanan"] = cttnPesanan;
+      dataSiapKirim["id_metode_bayar"] = null;
+      dataSiapKirim["id_plg"] = idPlg;
+    });
   }
 
   _snackBarShow(String str) {
@@ -80,21 +113,21 @@ class _inputKetPesanState extends State<inputKetPesan> {
     ));
   }
 
-  List<String> listKecamatan = [
-    "Banjarmasin Utara",
-    "Banjarmasin Barat",
-    "Banjarmasin Selatan",
-    "Banjarmasin Timur",
-    "Banjarmasin Tengah"
-  ];
-
   String _pilihKec = "Pilih kecamatan anda";
+  // int _valuePilihKec; ada diatas
   List<PopupMenuItem> itemKecamatan = [];
   final GlobalKey _menuKey = GlobalKey();
 
   handlePopupChange(String value) {
     setState(() {
-      _pilihKec = value;
+      _valuePilihKec = int.parse(value);
+    });
+  }
+
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      idPlg = preferences.getString("idPlg");
     });
   }
 
@@ -102,13 +135,17 @@ class _inputKetPesanState extends State<inputKetPesan> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getPref();
 
-    for (String kecamatan in listKecamatan) {
+    for (OngkirModel item in widget.dataOngkir) {
       itemKecamatan.add(PopupMenuItem(
-        child: Text("$kecamatan"),
-        value: kecamatan,
+        child: Text("${item.kecamatan}"),
+        value: item.id_ongkir,
       ));
     }
+
+    print(widget.dataPilihanJasa);
+    print(widget.dataOngkir);
   }
 
   @override
@@ -167,6 +204,8 @@ class _inputKetPesanState extends State<inputKetPesan> {
                     validator: (e) {
                       if (e.isEmpty) {
                         return "Isi alamat anda";
+                      } else if (e.length < 30) {
+                        return "Alamat terlalu pendek isikan alamat lengkap anda";
                       }
                     },
                     maxLines: 3,
@@ -180,11 +219,15 @@ class _inputKetPesanState extends State<inputKetPesan> {
                   ListTile(
                     leading: Icon(Icons.add_location),
                     title: Text('Pilih Kecamatan'),
-                    subtitle: Text(_pilihKec),
+                    subtitle: _valuePilihKec == null
+                        ? Text(_pilihKec)
+                        : Text(
+                            "${widget.dataOngkir[_valuePilihKec - 1].kecamatan}"),
                     trailing: PopupMenuButton(
                       icon: Icon(Icons.arrow_drop_down),
                       key: _menuKey,
-                      onSelected: (value) => handlePopupChange(value),
+                      onSelected: (value) =>
+                          handlePopupChange(value.toString()),
                       itemBuilder: (BuildContext context) => itemKecamatan,
                       tooltip: "Pilih kecamatan",
                     ),
@@ -224,6 +267,18 @@ class _inputKetPesanState extends State<inputKetPesan> {
                         hintText: "Masukan no hp yang bisa dihubungi",
                         hintStyle: TextStyle(fontSize: 12.0),
                         labelText: "No Handphone",
+                      ),
+                    ),
+                    // subtitle: Text(wktJemputTampil),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.collections_bookmark),
+                    title: TextFormField(
+                      onSaved: (e) => cttnPesanan = e,
+                      decoration: InputDecoration(
+                        hintText: "Catatan pesanan jika ada",
+                        hintStyle: TextStyle(fontSize: 12.0),
+                        labelText: "Catatan Pesanan",
                       ),
                     ),
                     // subtitle: Text(wktJemputTampil),

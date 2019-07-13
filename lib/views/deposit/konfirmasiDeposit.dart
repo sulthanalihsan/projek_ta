@@ -1,63 +1,209 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:projek_ta/model/api.dart';
+import 'package:projek_ta/model/depositModel.dart';
+import 'package:projek_ta/model/rekeningModel.dart';
 import 'package:projek_ta/views/deposit/detailTagihan.dart';
+import 'package:flutter_money_formatter/flutter_money_formatter.dart';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class KonfirmasiDeposit extends StatefulWidget {
+  final String nominal;
+  final RekeningModel rekening;
+
+  KonfirmasiDeposit(this.nominal, this.rekening);
+
   @override
   _KonfirmasiDepositState createState() => _KonfirmasiDepositState();
 }
 
 class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
+  String idPlg;
   final Color warnaPrimary = Color.fromARGB(255, 116, 150, 213);
   final TextStyle styleJudul = TextStyle(
       color: Color.fromARGB(255, 116, 150, 213), fontWeight: FontWeight.bold);
 
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      idPlg = preferences.getString("idPlg");
+    });
+  }
+
+  DepositModel lastDeposit;
+  getLastDeposit() async {
+    var queryParameters = {'id_plg': idPlg};
+    var uri = Uri.parse(BaseUrl.lastDeposit)
+        .replace(queryParameters: queryParameters)
+        .toString();
+    // final response = await http.get(BaseUrl.rekening);
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+    final response = await http.get(uri, headers: requestHeaders);
+    final data = jsonDecode(response.body);
+    final data_deposit = data['data_deposit'];
+
+    print("DATA ID LAST DEPOSIT");
+    print(data_deposit['id_deposit']);
+    if (response.statusCode == 200) {
+      final temp = new DepositModel(
+          data_deposit['id_deposit'],
+          data_deposit['id_plg'],
+          data_deposit['id_rek_bank'],
+          data_deposit['id_status'],
+          data_deposit['jml_deposit'],
+          data_deposit['waktu_deposit'],
+          data_deposit['kode_unik']);
+      setState(() {
+        lastDeposit = temp;
+      });
+    }
+    print("DATA OBJEK LAST DEPOSIT");
+    print(lastDeposit.jml_deposit);
+  }
+
+  var loading = false;
+  postData() async {
+    final response = await http.post(BaseUrl.deposit, body: {
+      'id_plg': idPlg,
+      'id_rek_bank': widget.rekening.id_rek_bank,
+      'jml_deposit': widget.nominal
+    });
+
+    final data = jsonDecode(response.body);
+    final status = data['status'];
+    final pesan = data['message'];
+    if (status == 1) {
+      print(pesan);
+      // Navigator.pop(context);
+      getLastDeposit();
+      _onLoadingBerhasil();
+    } else {
+      print(pesan);
+      Navigator.pop(context);
+      _onLoadingGagal();
+    }
+  }
+
+  void _onLoadingBerhasil() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Container(
+              height: MediaQuery.of(context).size.height / 4,
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Text("Loading...")
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(Duration(seconds: 2), () {
+      showSimpleNotification(
+          context, Text("Data berhasil disimpan silahkan lakukan transfer"),
+          background: Colors.green);
+
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  DetailTagihan(lastDeposit, widget.rekening,true)),
+          ModalRoute.withName(Navigator.defaultRouteName));
+    });
+  }
+
+  void _onLoadingGagal() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            content: Container(
+              height: MediaQuery.of(context).size.height / 4,
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Text("Loading...")
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(Duration(seconds: 2), () {
+      showSimpleNotification(context, Text("Gagal"), background: Colors.red);
+      Navigator.pop(context);
+    });
+  }
+
+  _alertDialogShow() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: new Text("Apakah anda yakin?"),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text("Batal"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              new FlatButton(
+                child: new Text("Konfirmasi"),
+                onPressed: () {
+                  postData();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getPref();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final FlutterMoneyFormatter nominalTampil = FlutterMoneyFormatter(
+        amount: double.parse(widget.nominal),
+        settings: MoneyFormatterSettings(
+            symbol: 'Rp',
+            thousandSeparator: '.',
+            decimalSeparator: ',',
+            symbolAndNumberSeparator: ' ',
+            fractionDigits: 2,
+            compactFormatType: CompactFormatType.long));
+
+    var format = new DateFormat('d MMMM yyyy');
+    var tglSekarang = format.format(new DateTime.now());
     final screenSize = MediaQuery.of(context).size;
-
-    _alertDialogShow() {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: new Text("Apakah anda yakin?"),
-              content: new Text("Deposit saldo \nNominal: Rp.  \nBank: "),
-              actions: <Widget>[
-                // usually buttons at the bottom of the dialog
-                new FlatButton(
-                  child: new Text("Cancel"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                new FlatButton(
-                  child: new Text("Yakin"),
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/home/detailTagihan',
-                        ModalRoute.withName(Navigator.defaultRouteName));
-                    // Navigator.of(context).pushAndRemoveUntil(
-                    //     MaterialPageRoute(
-                    //         builder: (context) => DetailTagihan()),
-                    //     ModalRoute.withName('/home/deposit_view"'));
-
-                    // Navigator.of(context)
-                    //     .pushReplacementNamed('/home/detailTagihan');
-
-                    // Navigator.pushNamedAndRemoveUntil(context, '/home/detailTagihan', ModalRoute.withName('/home/deposit_view'));
-                    // Navigator.of(context).pushNamedAndRemoveUntil('', );
-                    // Navigator.of(context)
-                    //     .pushReplacementNamed('/home/konfirmasiDeposit');
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => KonfirmasiDeposit()));
-                  },
-                ),
-              ],
-            );
-          });
-    }
 
     return Scaffold(
       floatingActionButton: Padding(
@@ -122,7 +268,7 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
                     "Tanggal Transaksi",
                     style: styleJudul,
                   ),
-                  Text("22 Juni 2019")
+                  Text(tglSekarang)
                 ],
               ),
               SizedBox(
@@ -135,7 +281,7 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
                     "Nominal Deposit",
                     style: styleJudul,
                   ),
-                  Text("Rp 200.000")
+                  Text("${nominalTampil.output.symbolOnLeft}")
                 ],
               ),
               SizedBox(
@@ -181,41 +327,17 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
-                          Text("Bank BCA"),
+                          Text("${widget.rekening.nama_bank}"),
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                            child: Text("M. Sulthan Al Ihsan"),
+                            child: Text("${widget.rekening.atas_nama_rek}"),
                           ),
-                          Text("2857291529273")
+                          Text("${widget.rekening.no_rek}")
                         ],
                       ),
                     ],
                   ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.start,
-                  //   children: <Widget>[
-                  //     Text("Bank"),
-                  //     Text(":"),
-                  //     Text("Bank BCA")
-                  //   ],
-                  // ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //   children: <Widget>[
-                  //     Text("Atas Nama"),
-                  //     Text(":"),
-                  //     Text("Muhammad Sulthan Al Ihsan")
-                  //   ],
-                  // ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  //   children: <Widget>[
-                  //     Text("No.Rek "),
-                  //     Text(":"),
-                  //     Text("29586381957")
-                  //   ],
-                  // ),
                 ],
               )
             ],
