@@ -64,8 +64,7 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
         lastDeposit = temp;
       });
     }
-    print("DATA OBJEK LAST DEPOSIT");
-    print(lastDeposit.jml_deposit);
+    berhasilMembuatTagihan();
   }
 
   var loading = false;
@@ -83,52 +82,32 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
       print(pesan);
       // Navigator.pop(context);
       getLastDeposit();
-      _onLoadingBerhasil();
+      // _onLoadingBerhasil();
     } else {
       print(pesan);
-      Navigator.pop(context);
-      _onLoadingGagal();
+      gagalMembuatTagihan();
     }
   }
 
-  void _onLoadingBerhasil() {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            content: Container(
-              height: MediaQuery.of(context).size.height / 4,
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  Text("Loading...")
-                ],
-              ),
-            ),
-          );
-        });
-
-    Future.delayed(Duration(seconds: 2), () {
-      showSimpleNotification(
-          context, Text("Data berhasil disimpan silahkan lakukan transfer"),
-          background: Colors.green);
-
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  DetailTagihan(lastDeposit, widget.rekening,true)),
-          ModalRoute.withName(Navigator.defaultRouteName));
-    });
+  void berhasilMembuatTagihan() {
+    showSimpleNotification(
+        context, Text("Tagihan berhasil dibuat silahkan lakukan transfer"),
+        background: Colors.green);
+    Navigator.pop(context);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                DetailTagihan(lastDeposit, widget.rekening, true)),
+        ModalRoute.withName(Navigator.defaultRouteName));
   }
 
-  void _onLoadingGagal() {
+  void gagalMembuatTagihan() {
+    Navigator.pop(context);
+    showSimpleNotification(context, Text("Gagal"), background: Colors.red);
+  }
+
+  void loadingDialog() {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -151,10 +130,7 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
           );
         });
 
-    Future.delayed(Duration(seconds: 2), () {
-      showSimpleNotification(context, Text("Gagal"), background: Colors.red);
-      Navigator.pop(context);
-    });
+    postData();
   }
 
   _alertDialogShow() {
@@ -174,7 +150,8 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
               new FlatButton(
                 child: new Text("Konfirmasi"),
                 onPressed: () {
-                  postData();
+                  Navigator.pop(context);
+                  loadingDialog();
                 },
               ),
             ],

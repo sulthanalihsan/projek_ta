@@ -77,7 +77,7 @@ class _ArtikelState extends State<Artikel> {
 
         listDataArtikelFav.add(temp);
         imgList.add(BaseUrl.url +
-            "doktersepatu/uploads/foto-artikel/" +
+            "uploads/foto-artikel/" +
             api['foto_header']);
       });
     }
@@ -278,7 +278,7 @@ class _ArtikelState extends State<Artikel> {
                                                 fadeInCurve: Curves.easeIn,
                                                 fit: BoxFit.cover,
                                                 image: BaseUrl.url +
-                                                    "doktersepatu/uploads/foto-artikel/${item.foto_header}",
+                                                    "uploads/foto-artikel/${item.foto_header}",
                                               )),
                                         )
                                       ],

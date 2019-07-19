@@ -252,8 +252,7 @@ class _SemuaArtikelState extends State<SemuaArtikel> {
                                       placeholder: kTransparentImage,
                                       fadeInCurve: Curves.easeIn,
                                       fit: BoxFit.cover,
-                                      image: BaseUrl.url +
-                                          "doktersepatu/uploads/foto-artikel/${item.foto_header}",
+                                      image: BaseUrl.fotoArtikel + item.foto_header,
                                     )),
                               )
                             ],

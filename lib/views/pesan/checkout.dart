@@ -95,6 +95,7 @@ class _CheckoutState extends State<Checkout> {
     } else {
       print("SharedPref saldoPlg gagal diganti");
     }
+    berhasilMembuatPesanan();
   }
 
   postData() async {
@@ -111,52 +112,31 @@ class _CheckoutState extends State<Checkout> {
     if (status == 1) {
       print(pesan);
       // Navigator.pop(context);
-      _onLoadingBerhasil();
+      // _onLoadingBerhasil();
+      getData();
     } else {
       print(pesan);
-      Navigator.pop(context);
-      _onLoadingGagal();
+      gagalMembuatPesanan();
     }
   }
 
-  void _onLoadingBerhasil() {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            content: Container(
-              height: MediaQuery.of(context).size.height / 4,
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 15.0,
-                  ),
-                  Text("Loading...")
-                ],
-              ),
-            ),
-          );
-        });
+  void berhasilMembuatPesanan() {
+    showSimpleNotification(context,
+        Text("Pesanan berhasil dibuat, admin akan segera menghubungi anda"),
+        background: Colors.green);
 
-    Future.delayed(Duration(seconds: 2), () {
-      showSimpleNotification(context,
-          Text("Pesanan berhasil dibuat, admin akan segera menghubungi anda"),
-          background: Colors.green);
-
-      getData();
-
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => Pesanan()),
-          ModalRoute.withName(Navigator.defaultRouteName));
-    });
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Pesanan()),
+        ModalRoute.withName(Navigator.defaultRouteName));
   }
 
-  void _onLoadingGagal() {
+  void gagalMembuatPesanan() {
+    Navigator.pop(context);
+    showSimpleNotification(context, Text("Gagal"), background: Colors.red);
+  }
+
+  void loadingDialog() {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -179,10 +159,7 @@ class _CheckoutState extends State<Checkout> {
           );
         });
 
-    Future.delayed(Duration(seconds: 2), () {
-      showSimpleNotification(context, Text("Gagal"), background: Colors.red);
-      Navigator.pop(context);
-    });
+    postData();
   }
 
   _alertDialogShow(String metodBayar, String ket) {
@@ -219,7 +196,8 @@ class _CheckoutState extends State<Checkout> {
               new FlatButton(
                 child: new Text("Konfirmasi"),
                 onPressed: () {
-                  postData();
+                  Navigator.pop(context);
+                  loadingDialog();
                 },
               ),
             ],

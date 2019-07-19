@@ -67,8 +67,7 @@ class _DetailArtikelState extends State<DetailArtikel> {
                   placeholder: kTransparentImage,
                   fadeInCurve: Curves.easeIn,
                   fit: BoxFit.cover,
-                  image: BaseUrl.url +
-                      "doktersepatu/uploads/foto-artikel/${widget.artikelModel.foto_header}",
+                  image: BaseUrl.fotoArtikel + widget.artikelModel.foto_header,
                 )),
               ),
             )

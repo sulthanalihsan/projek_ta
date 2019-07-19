@@ -10,7 +10,14 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
-  String saldoPlg, namaPlg, namaPglPlg, emailPlg, jkPlg, noHpPlg, alamatPlg;
+  String idPlg,
+      saldoPlg,
+      namaPlg,
+      namaPglPlg,
+      emailPlg,
+      jkPlg,
+      noHpPlg,
+      alamatPlg;
   int jmlRwtPesanan;
 
   var loading = false;
@@ -22,6 +29,7 @@ class _ProfilState extends State<Profil> {
     setState(() {
       saldoPlg = FormatUang().uangFormat(preferences.getString("saldoPlg"));
       namaPlg = preferences.getString("namaPlg");
+      idPlg = preferences.getString("idPlg");
       namaPglPlg = preferences.getString("namaPglPlg");
       emailPlg = preferences.getString("emailPlg");
       jkPlg = preferences.getString("jkPlg");
@@ -64,6 +72,7 @@ class _ProfilState extends State<Profil> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => EditProfil(
+                                      idPlg,
                                       namaPlg,
                                       namaPglPlg,
                                       emailPlg,

@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:projek_ta/model/api.dart';
+import 'package:projek_ta/ui_pisah/loadingDialog.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfil extends StatefulWidget {
-  final String namaPlg, namaPglPlg, emailPlg, jkPlg, noHpPlg, alamatPlg;
+  final String idPlg, namaPlg, namaPglPlg, emailPlg, jkPlg, noHpPlg, alamatPlg;
 
-  const EditProfil(this.namaPlg, this.namaPglPlg, this.emailPlg, this.jkPlg,
-      this.noHpPlg, this.alamatPlg);
+  const EditProfil(this.idPlg, this.namaPlg, this.namaPglPlg, this.emailPlg,
+      this.jkPlg, this.noHpPlg, this.alamatPlg);
   @override
   _EditProfilState createState() => _EditProfilState();
 }
@@ -32,7 +38,47 @@ class _EditProfilState extends State<EditProfil> {
   final _formState = GlobalKey<FormState>();
   final _scaffoldState = GlobalKey<ScaffoldState>();
   void check() {
-    print("checking....");
+    final form = _formState.currentState;
+    if (form.validate()) {
+      form.save();
+      LoadingDialog().loadingDialog(context, postData);
+      print("checking....");
+      print("$namaPlg $namaPglPlg $emailPlg $jkPlg $noHpPlg $alamatPlg");
+    } else {
+      setState(() {
+        _validate = true;
+      });
+    }
+  }
+
+  postData() async {
+    final response = await http.post(BaseUrl.editProfil, body: {
+      'id_plg': "${widget.idPlg}",
+      'nama_plg': "$namaPlg",
+      'nama_pgl_plg': "$namaPglPlg",
+      'email_plg': "$emailPlg",
+      'jk_plg': "$jkPlg",
+      'nohp_plg': "$noHpPlg",
+      'alamat_plg': "$alamatPlg"
+    });
+
+    final dataBody = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      print(dataBody['message']);
+      savePref();
+    }
+  }
+
+  savePref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+    preferences.setString(namaPglPlg, namaPglPlg);
+    preferences.commit();
+    });
+          Navigator.pop(context);
+
+      
   }
 
   @override
