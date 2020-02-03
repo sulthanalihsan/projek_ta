@@ -291,10 +291,10 @@ class _DetailTagihanState extends State<DetailTagihan> {
                         child: Text(widget.rekeningModel.no_rek),
                         onLongPress: () {
                           Clipboard.setData(
-                              new ClipboardData(text: "2857291529273"));
+                              new ClipboardData(text: "${widget.rekeningModel.no_rek}"));
                           _keyScaffold.currentState.showSnackBar(SnackBar(
                             duration: Duration(seconds: 2),
-                            content: Text("No rekening copied"),
+                            content: Text("No. rekening copied (${widget.rekeningModel.no_rek})"),
                           ));
                         }),
                   ],
@@ -326,7 +326,7 @@ class _DetailTagihanState extends State<DetailTagihan> {
                   Clipboard.setData(new ClipboardData(text: "$total"));
                   _keyScaffold.currentState.showSnackBar(SnackBar(
                     duration: Duration(seconds: 2),
-                    content: Text("Nominal copied"),
+                    content: Text("Nominal copied ($total)"),
                   ));
                 }),
           ],

@@ -2,15 +2,15 @@ class BaseUrl {
   // static String url = "http://192.168.100.6/";
   // static String url = "http://192.168.100.6/doktersepatu/";
   // static String url = "http://192.168.43.182/";
-  // static String url = "https://doktersepatu.000webhostapp.com/";
-  static String url = "http://doktersepatu.codebanua.me/";
+  static String url = "https://doktersepatu.000webhostapp.com/";
+  // static String url = "http://doktersepatu.codebanua.me/";
 
   // static String baseUrl = url + "doktersepatu/api/";
   static String baseUrl = url + "api/";
 
 //tmepat foto
   // static String beforeAfter = url + "doktersepatu/uploads/foto-before-after/";
-  // static String fotoArtikel = url + "doktersepatu/uploads/foto-artikel/";
+  // static String fotoArtikel = url + "dokters epatu/uploads/foto-artikel/";
 
   static String beforeAfter = url + "uploads/foto-before-after/";
   static String fotoArtikel = url + "uploads/foto-artikel/";

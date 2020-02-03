@@ -104,6 +104,9 @@ class _CheckoutState extends State<Checkout> {
       original[key] = value.toString();
     });
 
+    // print("INI ADALAH DATA YANG DIPOST");
+    // print(original);
+
     final response = await http.post(BaseUrl.pesanan, body: original);
 
     final data = jsonDecode(response.body);

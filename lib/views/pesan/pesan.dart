@@ -77,6 +77,8 @@ class _PesanState extends State<Pesan> {
         tarifJasa[api['id_detail_jasa']] = int.parse(api['tarif']);
       });
     }
+    
+        print(idDetailJasa);
 
     final responseOngkir = await http.get(BaseUrl.ongkir);
     final dataOngkir = jsonDecode(responseOngkir.body);

@@ -204,7 +204,9 @@ class _DetailPesananState extends State<DetailPesanan> {
                                                   BorderRadius.circular(5.0),
                                               color: item.id_status == "1"
                                                   ? Colors.orange[400]
-                                                  : Colors.green[400],
+                                                  : (item.id_status == "2"
+                                                      ? Colors.green[400]
+                                                      : Colors.teal[400]),
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.all(2.0),
@@ -910,7 +912,9 @@ class _DetailPesananState extends State<DetailPesanan> {
                             borderRadius: BorderRadius.circular(15.0),
                             color: item.id_status == "1"
                                 ? Colors.orange[400]
-                                : Colors.green[400],
+                                : (item.id_status == "2"
+                                    ? Colors.green[400]
+                                    : Colors.teal[400]),
                             child: Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Text("$namaStatus",
