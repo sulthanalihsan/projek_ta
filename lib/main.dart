@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
     final data = dataBody['data_akun'];
 
     if (status == 1) {
-      showSimpleNotification(context, Text("Login Berhasil"),
+      showSimpleNotification(context,Text("Login Berhasil"),
           background: Colors.green);
       setState(() {
         _loginStatus = LoginStatus.signIn;
@@ -89,8 +89,8 @@ class _MyAppState extends State<MyApp> {
       // print(data['transaksi']);
       // print(data);
     } else {
-      showSimpleNotification(
-          context, Text("Login Gagal, Email atau password salah"),
+      showSimpleNotification(context,
+         Text("Login Gagal, Email atau password salah"),
           background: Colors.red);
       setState(() {
         _loginStatus = LoginStatus.notSignIn;

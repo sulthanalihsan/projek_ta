@@ -1,4 +1,4 @@
-package com.example.projek_ta;
+package com.sulthan.projek_ta;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

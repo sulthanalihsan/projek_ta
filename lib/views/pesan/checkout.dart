@@ -136,7 +136,7 @@ class _CheckoutState extends State<Checkout> {
 
   void gagalMembuatPesanan() {
     Navigator.pop(context);
-    showSimpleNotification(context, Text("Gagal"), background: Colors.red);
+    showSimpleNotification(context,Text("Gagal"), background: Colors.red);
   }
 
   void loadingDialog() {

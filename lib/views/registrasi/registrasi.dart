@@ -23,6 +23,7 @@ class _RegistrasiState extends State<Registrasi> {
   }
 
   var _autovalidate = false;
+
   check() {
     final form = _key.currentState;
     if (form.validate()) {
@@ -94,6 +95,7 @@ class _RegistrasiState extends State<Registrasi> {
   }
 
   var loading = false;
+
   registrasi() async {
     setState(() {
       loading = true;
@@ -112,7 +114,7 @@ class _RegistrasiState extends State<Registrasi> {
       setState(() {
         loading = false;
         Navigator.pop(context);
-        showSimpleNotification(context, Text(dataBody['message']),
+        showSimpleNotification(context,Text(dataBody['message']),
             background: Colors.green);
         Navigator.pop(context);
       });
@@ -120,7 +122,7 @@ class _RegistrasiState extends State<Registrasi> {
       setState(() {
         loading = false;
         Navigator.pop(context);
-        showSimpleNotification(context, Text(dataBody['message']),
+        showSimpleNotification(context,Text(dataBody['message']),
             background: Colors.red);
       });
     }

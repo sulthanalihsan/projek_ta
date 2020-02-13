@@ -88,7 +88,7 @@ class _HomeState extends State<Home> {
     Future.delayed(Duration(seconds: 2), () {
       Navigator.pop(context);
       widget.signOut();
-      showSimpleNotification(context, Text("Berhasil keluar"),
+      showSimpleNotification(context,Text("Berhasil keluar"),
           background: Colors.red);
     });
   }

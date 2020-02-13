@@ -90,8 +90,8 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
   }
 
   void berhasilMembuatTagihan() {
-    showSimpleNotification(
-        context, Text("Tagihan berhasil dibuat silahkan lakukan transfer"),
+    showSimpleNotification(context,
+       Text("Tagihan berhasil dibuat silahkan lakukan transfer"),
         background: Colors.green);
     Navigator.pop(context);
     Navigator.pushAndRemoveUntil(
@@ -104,7 +104,7 @@ class _KonfirmasiDepositState extends State<KonfirmasiDeposit> {
 
   void gagalMembuatTagihan() {
     Navigator.pop(context);
-    showSimpleNotification(context, Text("Gagal"), background: Colors.red);
+    showSimpleNotification(context,Text("Gagal"), background: Colors.red);
   }
 
   void loadingDialog() {

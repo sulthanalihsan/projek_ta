@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.projek_ta">
+    package="com.sulthan.projek_ta">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -9,10 +9,10 @@
     <uses-permission android:name="android.permission.INTERNET" /> 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="projek_ta"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Dokter Sepatu Demo"
+        android:icon="@mipmap/ic_logo">
         <activity
-            android:name=".MainActivity"
+            android:name="com.sulthan.projek_ta.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
