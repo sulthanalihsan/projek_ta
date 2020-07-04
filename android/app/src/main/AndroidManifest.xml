@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sulthan.projek_ta">
+    package="com.sulthan.project_ta">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -12,7 +12,7 @@
         android:label="Dokter Sepatu Demo"
         android:icon="@mipmap/ic_logo">
         <activity
-            android:name="com.sulthan.projek_ta.MainActivity"
+            android:name="com.sulthan.project_ta.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
